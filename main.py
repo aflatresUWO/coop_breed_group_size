@@ -12,7 +12,7 @@ import pandas as pd
 #First figure
 #Total level of help in groups with fecundity benefits
 #Data:
-data = pd.read_csv('result_p_b_all.csv')
+data = pd.read_csv('result_p_b_ga.csv')
 
 db = np.array(data.loc[:,"db"])
 b = np.array(data.loc[:,"b"])
@@ -32,24 +32,23 @@ for i in range(0,n_b):
 
 hxbx = np.zeros(n_b*n_db)
 hyby = np.zeros(n_b*n_db)
-
+print(hxbx-hyby>0.05)
 k = 0
 for i in range(0,n_b):
     for j in range(0,n_db):
         hxbx[k] = hx_data[k]*B[i]
         hyby[k] = hy_data[k]*(B[i]+db[j])
         k+=1
-        
+print(hxbx-hyby>0.05)
 fig, ax=plt.subplots()
 ax.scatter(hxbx,hyby)
 ax.plot(hxbx,hxbx,color = "red")
 plt.xlabel('$h_xb_x$',fontsize = 20.0)
 plt.ylabel("$h_yb_y$",fontsize = 20.0)
-
 ############################################
 
 #Total level of help in groups with survival benefits
-data = pd.read_csv('result_p_s.csv')
+data = pd.read_csv('result_p_s_2.csv')
 
 ds = np.array(data.loc[:,"ds"])
 s = np.array(data.loc[:,"s"])
@@ -75,11 +74,10 @@ for i in range(0,n_s):
         hx[i,j] = hx_data[k]
         hy[i,j] = hy_data[k]
         k+=1
-        
 fig, ax=plt.subplots()
 plt.rc('font', size=15)
 plt.rc('axes', labelsize = 15)
-
+print(hx-hy)
 ax.scatter(hx_data,hy_data)
 ax.plot(hx_data,hx_data,color="red")
 plt.xlabel('$h_x$',fontsize = 20.0)
@@ -87,7 +85,7 @@ plt.ylabel("$h_y$",fontsize = 20.0)
 ########################################
 #Second figure: group augmentation
 #Level of help with group augmentation vs none
-data = pd.read_csv('result_p_b_all_2.csv')
+data = pd.read_csv('result_p_b_all.csv')
 
 db = np.array(data.loc[:,"db"])
 b = np.array(data.loc[:,"b"])
@@ -107,7 +105,7 @@ for i in range(0,int(len(b)/n_db)):
 hx = np.zeros(n_b*n_db)
 hy = np.zeros(n_b*n_db)
 
-data = pd.read_csv('result_p_GA_2.csv')
+data = pd.read_csv('result_p_b_ga.csv')
 hx_GA_data = np.array(data.loc[:,"h_x"])
 hy_GA_data = np.array(data.loc[:,"h_y"])
     
@@ -118,6 +116,7 @@ k = 0
 for i in range(0,n_b):
     for j in range(0,n_db):
         hx_diff[i,j] = hx_GA_data[k]-hx_data[k]
+        
         hy_diff[i,j] = hy_GA_data[k]-hy_data[k]
         k+=1
 
@@ -225,8 +224,10 @@ plt.show()
 #Fourth figure: probability of establishment
 #Probability of establishment and hx when varying fecundity
 fig, ax=plt.subplots()
-data = pd.read_csv('result_p_b_all.csv')
+data = pd.read_csv('result_p_b_all_2.csv')
 p2 = np.array(data.loc[:,"P2"])
+print("p2")
+print(p2)
 h= np.array(data.loc[:,"h_x"])
 db= np.array(data.loc[:,"db"])
 n_p = int(np.sqrt(len(p2)))
@@ -261,7 +262,7 @@ plt.legend(["$\Delta b=1.68$","$\Delta b=1.16$","$\Delta b=0.63$"],fontsize =13.
 ########################
 #Probability of establishment and hx when varying survival
 fig, ax=plt.subplots()
-data = pd.read_csv('result_p_s.csv')
+data = pd.read_csv('result_p_s_2.csv')
 p2 = np.array(data.loc[:,"P2"])
 h= np.array(data.loc[:,"h_x"])
 ds= np.array(data.loc[:,"ds"])
@@ -300,7 +301,7 @@ plt.legend(["$\Delta s=0.17$","$\Delta s=0.12$","$\Delta s=0.06$"],fontsize =13.
 #########################
 #Probability of establishment and hx when varying fecundity
 fig, ax=plt.subplots()
-data = pd.read_csv('result_p_b_all.csv')
+data = pd.read_csv('result_p_b_all_2.csv')
 p2 = np.array(data.loc[:,"P2"])
 h= np.array(data.loc[:,"h_x"])
 db= np.array(data.loc[:,"db"])
@@ -340,7 +341,7 @@ plt.legend(["$b_x=6.58$","$ b_x=5.53$","$b_x=4.47$"],fontsize =13.0, bbox_to_anc
 #########################
 #Probability of establishment and hx when varying survival
 fig, ax=plt.subplots()
-data = pd.read_csv('result_p_s.csv')
+data = pd.read_csv('result_p_s_2.csv')
 p2 = np.array(data.loc[:,"P2"])
 h= np.array(data.loc[:,"h_x"])
 ds= np.array(data.loc[:,"ds"])
