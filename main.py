@@ -1,270 +1,181 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu May 26 11:43:15 2022
+Created on Thu Aug 17 16:20:08 2023
 
-@author: aflatres
+@author: Alan
 """
 #Libraries
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-######################
-#First figure
-#Total level of help in groups with fecundity benefits
-#Data:
-data = pd.read_csv('result_p_b_sub.csv')
-
-db = np.array(data.loc[:,"db"])
-b = np.array(data.loc[:,"b"])
-hx_data = np.array(data.loc[:,"h_x"])
-hy_data = np.array(data.loc[:,"h_y"])
-
-
-n_db = int(np.sqrt(len(db)))
-n_b = n_db
-db = db[0:n_db]
-
-B = np.zeros(n_b)
-
-P = np.zeros(n_b)
-for i in range(0,n_b):
-    B[i] = b[i*n_db]
-
-hxbx = np.zeros(n_b*n_db)
-hyby = np.zeros(n_b*n_db)
-k = 0
-for i in range(0,n_b):
-    for j in range(0,n_db):
-        hxbx[k] = hx_data[k]*B[i]
-        hyby[k] = hy_data[k]*(B[i]+db[j])
-        k+=1
-fig, ax=plt.subplots()
-ax.scatter(hxbx,hyby)
-ax.plot(hxbx,hxbx,color = "red")
-plt.xlabel('$h_xb_xpppp$',fontsize = 20.0)
-plt.ylabel("$h_yb_y$",fontsize = 20.0)
-############################################
-
-#Total level of help in groups with survival benefits
-data = pd.read_csv('result_p_s_2.csv')
-
-ds = np.array(data.loc[:,"ds"])
-s = np.array(data.loc[:,"s"])
-
-hx_data = np.array(data.loc[:,"h_x"])
-hy_data = np.array(data.loc[:,"h_y"])
-
-n_ds = int(np.sqrt(len(ds)))
-ds = ds[0:n_ds]
-n_s = n_ds
-
-
-S = np.zeros(n_s)
-P = np.zeros(n_s)
-for i in range(0,int(len(s)/n_ds)):
-    S[i] = s[i*n_ds]
-hx = np.zeros((n_s,n_ds))
-hy = np.zeros((n_s,n_ds))
-
-k = 0
-for i in range(0,n_s):
-    for j in range(0,n_ds):
-        hx[i,j] = hx_data[k]
-        hy[i,j] = hy_data[k]
-        k+=1
-fig, ax=plt.subplots()
-plt.rc('font', size=15)
-plt.rc('axes', labelsize = 15)
-print(hx-hy)
-ax.scatter(hx_data,hy_data)
-ax.plot(hx_data,hx_data,color="red")
-plt.xlabel('$h_x$',fontsize = 20.0)
-plt.ylabel("$h_y$",fontsize = 20.0)
-########################################
-#Second figure: group augmentation
-#Level of help with group augmentation vs none
-data = pd.read_csv('result_p_b_all.csv')
-
-db = np.array(data.loc[:,"db"])
-b = np.array(data.loc[:,"b"])
-hx_data = np.array(data.loc[:,"P2"])
-hy_data = np.array(data.loc[:,"h_y"])
-
-
-n_db = int(np.sqrt(len(db)))
-n_b = n_db
-db = db[0:n_db]
-
-B = np.zeros(n_b)
-P = np.zeros(n_b)
-for i in range(0,int(len(b)/n_db)):
-    B[i] = b[i*n_db]
-    
-hx = np.zeros(n_b*n_db)
-hy = np.zeros(n_b*n_db)
-
-data = pd.read_csv('result_p_b_ga.csv')
-hx_GA_data = np.array(data.loc[:,"h_x"])
-hy_GA_data = np.array(data.loc[:,"h_y"])
-    
-hx_diff = np.zeros((n_b,n_db))
-hy_diff = np.zeros((n_b,n_db))
-
-k = 0
-for i in range(0,n_b):
-    for j in range(0,n_db):
-        hx_diff[i,j] = hx_data[k]
-        
-        hy_diff[i,j] = hy_GA_data[k]-hy_data[k]
-        k+=1
-
-fig, ax=plt.subplots()
-
-plt.rc('font', size=15)
-plt.rc('axes', labelsize = 15)
-level = np.linspace(0,0.5,7)
-
-
-cp=ax.contourf(db,B,hx_diff)
-level = np.linspace(0,0,1)
-ax.contour(db,B,hx_diff,levels = level,colors = "red")
-fig.colorbar(cp,label = "$h_x$ (GA) $-h_x$ (no GA)")#Add a colorbar to a plot
-plt.xlabel('Fecundity benefits $b_y-b_x$',fontsize = 20.0)
-plt.ylabel("Fecundity $b_x$",fontsize = 20.0)
-plt.show()
-
-
 
 ############################
-#Third figure: selfing 
-#Phi and fecundity benefits
-data = pd.read_csv('result_phi_bre_test.csv')
-
-db = np.array(data.loc[:,"db"])
-phi = np.array(data.loc[:,"phi"])
-hx_data = np.array(data.loc[:,"h_x"])
-hy_data = np.array(data.loc[:,"h_y"])
-
+# Figure: selfing
+# Panel A: delayed dispersal level
+#Data collection
+data = pd.read_csv('result_phi_b_sub.csv')
+db = np.array(data.loc[:, "db"])
+phi = np.array(data.loc[:, "phi"])
+hx_data = np.array(data.loc[:, "h_x"])
+hy_data = np.array(data.loc[:, "h_y"])
+#Dimensions
 n_db = int(np.sqrt(len(db)))
 db = db[0:n_db]
 n_phi = n_db
 
-
+#Phi:
 Phi = np.zeros(n_phi)
-
-for i in range(0,int(len(phi)/n_db)):
+for i in range(0, int(len(phi)/n_db)):
     Phi[i] = phi[i*n_db]
-    
-hx = np.zeros((n_phi,n_db))
-hy = np.zeros((n_phi,n_db))
+
+#hx and hy values
+hx = np.zeros((n_phi, n_db))
+hy = np.zeros((n_phi, n_db))
 
 k = 0
-for i in range(0,n_phi):
-    for j in range(0,n_db):
-        hx[i,j] = hx_data[k]
-        hy[i,j] = hy_data[k]
-        k+=1
+for i in range(0, n_phi):
+    for j in range(0, n_db):
+        hx[i, j] = hx_data[k]
+        hy[i, j] = hy_data[k]
+        k += 1
 
-fig, ax=plt.subplots()
+#Plot:
+fig, ax = plt.subplots()
 plt.rc('font', size=15)
-plt.rc('axes', labelsize = 15)
-level = np.linspace(0,0.9,7)
-
-cp=ax.contourf(db,Phi,hx)
-level = np.linspace(0,0,1)
-#ax.contour(db,Phi,hx,levels = level,colors = "red")
-fig.colorbar(cp,label = "$h_x^*$")#Add a colorbar to a plot
-plt.xlabel('Fecundity benefits $b_y-b_x$',fontsize = 20.0)
-plt.ylabel("Selfing $\phi$",fontsize = 20.0)
-#plt.title("Contour plot of ESS $h_x$ vs $\Delta b$ and probability of establishment",fontsize = 15.0)
+plt.rc('axes', labelsize=15)
+level = np.linspace(0, 0.9, 7)
+cp = ax.contourf(db, Phi, hx)
+fig.colorbar(cp, label="$h_x^*$ level")  
+plt.xlabel('$b_y-b_x$', fontsize=20.0)
+plt.ylabel("Selfing $\phi$", fontsize=20.0)
 plt.show()
-######################################
-#Phi and GA
-GA_data = np.array(data.loc[:,"GA"])
-GA = np.zeros((n_phi,n_db))
+
+#Panel B: Reproductive value
+RV_data = np.array(data.loc[:, "RV"])
+RV = np.zeros((n_phi, n_db))
 
 k = 0
-for i in range(0,n_phi):
-    for j in range(0,n_db):
-        GA[i,j] = GA_data[k]
-        k+=1
+for i in range(0, n_phi):
+    for j in range(0, n_db):
+        RV[i, j] = RV_data[k]
+        k += 1
 
-fig, ax=plt.subplots()
+fig, ax = plt.subplots()
 plt.rc('font', size=15)
-plt.rc('axes', labelsize = 15)
-level = np.linspace(0.12,0.17,7)
-
-cp=ax.contourf(db,Phi,GA)
-fig.colorbar(cp,label = "GA")#Add a colorbar to a plot
-plt.xlabel('Fecundity benefits $b_y-b_x$',fontsize = 20.0)
+plt.rc('axes', labelsize=15)
+levels = np.linspace(0.12, 0.17, 7)
+cp = ax.contourf(db, Phi, RV,levels=levels)
+fig.colorbar(cp, label="Reprod. value of a late disperser")  # Add a colorbar to a plot
+plt.xlabel(' $b_y-b_x$', fontsize=20.0)
 plt.show()
-#########################
-#Phi and cost
-cost_data = np.array(data.loc[:,"cost"])
-cost = np.zeros((n_phi,n_db))
+
+#Cost of delayed dispersal
+
+cost_data = np.array(data.loc[:, "cost"])
+cost = np.zeros((n_phi, n_db))
 
 k = 0
-for i in range(0,n_phi):
-    for j in range(0,n_db):
-        cost[i,j] = cost_data[k]
-        k+=1
+for i in range(0, n_phi):
+    for j in range(0, n_db):
+        cost[i, j] = cost_data[k]
+        k += 1
 
-fig, ax=plt.subplots()
+fig, ax = plt.subplots()
 plt.rc('font', size=15)
-plt.rc('axes', labelsize = 15)
-print("cost")
-print(hx)
-cp=ax.contourf(db,Phi,cost)
-fig.colorbar(cp,label = "Cost")#Add a colorbar to a plot
-plt.xlabel('Fecundity benefits $b_y-b_x$',fontsize = 20.0)
+plt.rc('axes', labelsize=15)
+level = np.linspace(-1.35e-5,-0.3e-5,7)
+cp = ax.contourf(db, Phi, cost,levels=level)
+fig.colorbar(cp, label="Cost ($\Delta_{h_x}W_{Indiv}$)")  # Add a colorbar to a plot
+plt.xlabel(' $b_y-b_x$', fontsize=20.0)
 plt.show()
-#########################
-#Fourth figure: probability of establishment
-#Probability of establishment and hx when varying fecundity
-fig, ax=plt.subplots()
-data = pd.read_csv('result_p_b_all.csv')
-p2 = np.array(data.loc[:,"P2"])
 
-h= np.array(data.loc[:,"h_x"])
-db= np.array(data.loc[:,"db"])
+########################################
+#Figure 3: probability of establishment and delayed dispersal level
+#Panel A: fecundity
+
+#Data collection
+data = pd.read_csv('result_b_sub.csv')
+p2 = np.array(data.loc[:, "P2"])
+h = np.array(data.loc[:, "h_x"])
+db = np.array(data.loc[:, "db"])
+
+#Dimension:
 n_p = int(np.sqrt(len(p2)))
 n_b = n_p
 db = db[0:n_b]
+
+#Probability of esta. and delayed dispersal level for 3 fecundity benefits:
 P1 = np.zeros(n_p)
 H1 = np.zeros(n_p)
 P2 = np.zeros(n_p)
 H2 = np.zeros(n_p)
 P3 = np.zeros(n_p)
 H3 = np.zeros(n_p)
-for i in range(0,n_p):
-    P1[i] = p2[7+i*len(db)]
-    H1[i] = h[7+i*len(db)]
-    P2[i] = p2[12+i*len(db)]
-    H2[i] = h[12+i*len(db)]
+for i in range(0, n_p):
+    P1[i] = p2[10+i*len(db)]
+    H1[i] = h[10+i*len(db)]
+    P2[i] = p2[13+i*len(db)]
+    H2[i] = h[13+i*len(db)]
     P3[i] = p2[17+i*len(db)]
     H3[i] = h[17+i*len(db)]
-    
 
-P1 = P1[H1>0]
-H1 = H1[H1>0]
-P2 = P2[H2>0]
-H2 = H2[H2>0]
-P3 = P3[H3>0]
-H3 = H3[H3>0]
+#Plot:
+fig, ax = plt.subplots()
+color=np.linspace(1,0,len(P1))
+plt.scatter(P3, H3,s=150,c=color,cmap="RdBu")
+plt.scatter(P2, H2,s=70,c=color,cmap="RdBu")
+plt.scatter(P1, H1,s=20,c=color,cmap="RdBu")
+plt.xlim(0.05,0.15)
+plt.ylim(0.07,0.37)
+plt.xlabel("Probability of establishment",fontsize=20)
+plt.ylabel("$h_x^*$ level",fontsize=20)
 
-plt.scatter(P3,H3)
-plt.scatter(P2,H2)
-plt.scatter(P1,H1)
-plt.legend(["$\Delta b=1.68$","$\Delta b=1.16$","$\Delta b=0.63$"],fontsize =13.0, bbox_to_anchor=[0.36,1])
-########################
-#Probability of establishment and hx when varying survival
-fig, ax=plt.subplots()
-data = pd.read_csv('result_p_s_2.csv')
-p2 = np.array(data.loc[:,"P2"])
-h= np.array(data.loc[:,"h_x"])
-ds= np.array(data.loc[:,"ds"])
+#Panel B: survival
+#Data collection
+data = pd.read_csv('result_s_sub.csv')
+p2 = np.array(data.loc[:, "P2"])
+h = np.array(data.loc[:, "h_x"])
+ds = np.array(data.loc[:, "ds"])
 
-n_p = int(np.sqrt(len(ds)))
+#Dimension:
+n_p = int(np.sqrt(len(p2)))
+n_s = n_p
+ds = ds[0:n_s]
+#Probability of esta. and delayed dispersal level for 3 survival benefits:
+P1 = np.zeros(n_p)
+H1 = np.zeros(n_p)
+P2 = np.zeros(n_p)
+H2 = np.zeros(n_p)
+P3 = np.zeros(n_p)
+H3 = np.zeros(n_p)
+for i in range(0, n_p):
+    P1[i] = p2[10+i*len(ds)]
+    H1[i] = h[10+i*len(ds)]
+    P2[i] = p2[12+i*len(ds)]
+    H2[i] = h[12+i*len(ds)]
+    P3[i] = p2[15+i*len(ds)]
+    H3[i] = h[15+i*len(ds)]
+
+
+#Plot:
+fig, ax = plt.subplots()
+color=np.linspace(1,0.9,len(P3))
+plt.scatter(P3, H3,s=150,c=color,cmap="RdBu")
+plt.scatter(P2, H2,s=70,c=color,cmap="RdBu")
+plt.scatter(P1, H1,s=20,c=color,cmap="RdBu")
+plt.xlim(0.05,0.27)
+plt.ylim(0,0.6)
+plt.xlabel("Probability of establishment",fontsize=20)
+plt.ylabel("$h_x^*$ level",fontsize=20)
+
+#Panel C: subordinate's survival
+#Data colelction
+data = pd.read_csv('result_say_sub.csv')
+p2 = np.array(data.loc[:, "P2"])
+
+h = np.array(data.loc[:, "h_x"])
+ds = np.array(data.loc[:, "ds"])
+n_p = int(np.sqrt(len(p2)))
 n_s = n_p
 ds = ds[0:n_s]
 P1 = np.zeros(n_p)
@@ -273,284 +184,420 @@ P2 = np.zeros(n_p)
 H2 = np.zeros(n_p)
 P3 = np.zeros(n_p)
 H3 = np.zeros(n_p)
-for i in range(0,n_p):
-    P1[i] = p2[7+i*n_s]
-    H1[i] = h[7+i*n_s]
-    P2[i] = p2[12+i*n_s]
-    H2[i] = h[12+i*n_s]
-    P3[i] = p2[17+i*n_s]
-    H3[i] = h[17+i*n_s]
-    
+for i in range(0, n_p):
+    P1[i] = p2[5+i*len(ds)]
+    H1[i] = h[5+i*len(ds)]
+    P2[i] = p2[10+i*len(ds)]
+    H2[i] = h[10+i*len(ds)]
+    P3[i] = p2[15+i*len(ds)]
+    H3[i] = h[15+i*len(ds)]
 
-P1 = P1[H1>0]
-H1 = H1[H1>0]
-P2 = P2[H2>0]
-H2 = H2[H2>0]
-P3 = P3[H3>0]
-H3 = H3[H3>0]
-
-plt.scatter(P3,H3)
-plt.scatter(P2,H2)
-plt.scatter(P1,H1)
-plt.legend(["$\Delta s=0.17$","$\Delta s=0.12$","$\Delta s=0.06$"],fontsize =13.0, bbox_to_anchor=[0.64,0.66])
+#Plot:
+fig, ax = plt.subplots()
+color=np.linspace(1,0,len(P1))
+plt.scatter(P3, H3,s=150,c=color,cmap="RdBu")
+plt.scatter(P2, H2,s=70,c=color,cmap="RdBu")
+plt.scatter(P1, H1,s=20,c=color,cmap="RdBu")
+plt.xlabel("Probability of establishment",fontsize=20)
+plt.ylabel("$h_x^*$ level",fontsize=20)
+plt.xlim(0.12,0.16)
+plt.ylim(0,1.05)
 
 
-#########################
-#Probability of establishment and hx when varying fecundity
-fig, ax=plt.subplots()
-data = pd.read_csv('result_p_b_all.csv')
-p2 = np.array(data.loc[:,"P2"])
-h= np.array(data.loc[:,"h_x"])
-db= np.array(data.loc[:,"db"])
+fig, ax = plt.subplots()
+hb = np.linspace(0,5)
+plt.plot(hb,np.exp(-hb),color="black")
+plt.xlabel("$h_xb_x$",fontsize=20)
+plt.ylabel("$T_x'$",fontsize=20)
 
-n_db = int(np.sqrt(len(db)))
-n_p = n_db
+###########################
+#Figure 4: breeder-subordinate conflicts
+#Panel A: fecundity
+#Ai, ii: no group augmentation
+#Data collection
+data_sub = pd.read_csv('result_b_sub_3.csv')
+data_bre = pd.read_csv('result_b_bre_3.csv')
+
+db = np.array(data_sub.loc[:, "db"])
+b = np.array(data_sub.loc[:, "b"])
+hx_data_sub = np.array(data_sub.loc[:, "h_x"])
+hx_data_bre = np.array(data_bre.loc[:, "h_x"])
+
+#Dimension
+n_db = int(len(db)/3)
+n_b = 3
 db = db[0:n_db]
-P1 = np.zeros(n_p)
-H1 = np.zeros(n_p)
-P2 = np.zeros(n_p)
-H2 = np.zeros(n_p)
-P3 = np.zeros(n_p)
-H3 = np.zeros(n_p)
-for i in range(0,n_p):
-    P1[i] = p2[i+7*n_db]
-    H1[i] = h[i+7*n_b]
-    P2[i] = p2[i+12*n_db]
-    H2[i] = h[i+12*n_db]
-    P3[i] = p2[i+17*n_db]
-    H3[i] = h[i+17*n_db]
+B = np.zeros(3)
+
+for i in range(0, n_b):
+    B[i] = b[i*n_db]
     
+#Computation of the data
+hx_data_sub_b = hx_data_sub[n_db:2*n_db]
+hx_data_bre_b = hx_data_bre[n_db:2*n_db]
+#Difference between breeder and subordinate
+hx_data_diff_b1 = hx_data_bre[0:n_db]-hx_data_sub[0:n_db]
+hx_data_diff_b2 = hx_data_bre[n_db:2*n_db]-hx_data_sub[n_db:2*n_db]
+hx_data_diff_b3 = hx_data_bre[-n_db:]-hx_data_sub[-n_db:]
 
-P1 = P1[H1>0]
-H1 = H1[H1>0]
-P2 = P2[H2>0]
-H2 = H2[H2>0]
-P3 = P3[H3>0]
-H3 = H3[H3>0]
+#Thresholds:
+th_sub = db[len(db)-sum(hx_data_sub_b>0)-1]
+th_bre = db[len(db)-sum(hx_data_bre_b>0)-1]
 
-plt.scatter(P3,H3,color="black")
-plt.scatter(P2,H2,color="red")
-plt.scatter(P1,H1,color = "orange")
-plt.xlim(0.07,0.145)
-plt.legend(["$b_x=6.58$","$ b_x=5.53$","$b_x=4.47$"],fontsize =13.0, bbox_to_anchor=[0.66,0.98])
-########################
-#Probability of establishment and hx when varying survival
-fig, ax=plt.subplots()
-data = pd.read_csv('result_p_s_2.csv')
-p2 = np.array(data.loc[:,"P2"])
-h= np.array(data.loc[:,"h_x"])
-ds= np.array(data.loc[:,"ds"])
-n_p = int(np.sqrt(len(ds)))
-n_s = n_p
+#Plot of the level
+fig, ax = plt.subplots()
+plt.plot(db, hx_data_sub_b, color="black")
+plt.plot(db, hx_data_bre_b, color="grey")
+plt.axvline(x=th_sub,color="brown",linewidth=0.5)
+plt.axvline(x=th_bre,color="orange",linewidth=0.5)
+plt.xlabel('$b_y-b_x$', fontsize=20.0)
+plt.ylabel("$h_x^*$ level", fontsize=20.0)
+ax.legend(["sub ctrl", "breeder ctrl"])
+plt.ylim([0,1])
 
-ds = db[0:n_s]
-P1 = np.zeros(n_p)
-H1 = np.zeros(n_p)
-P2 = np.zeros(n_p)
-H2 = np.zeros(n_p)
-P3 = np.zeros(n_p)
-H3 = np.zeros(n_p)
-for i in range(0,n_p):
-    P1[i] = p2[i+7*n_s]
-    H1[i] = h[i+7*n_s]
-    P2[i] = p2[i+12*n_s]
-    H2[i] = h[i+12*n_s]
-    P3[i] = p2[i+17*n_s]
-    H3[i] = h[i+17*n_s]
-    
-P1 = P1[H1>0]
-H1 = H1[H1>0]
-P2 = P2[H2>0]
-H2 = H2[H2>0]
-P3 = P3[H3>0]
-H3 = H3[H3>0]
+#Plot of the difference, i.e. the conflict
+fig, ax = plt.subplots()
+plt.plot(db, hx_data_diff_b1, color="black", linestyle="dashed")
+plt.plot(db, hx_data_diff_b2, color="black")
+plt.plot(db, hx_data_diff_b3, color="black", linestyle="dotted")
+plt.legend(["$b_x=4.0$", "$b_x=5.0$", "$b_x=6.0$"])
+plt.ylim([0,1])
 
-plt.scatter(P3,H3,color="black")
-plt.scatter(P2,H2,color="red")
-plt.scatter(P1,H1,color="orange")
-plt.xlim(0.025,0.145)
+plt.axvline(x=th_sub,color="brown",linewidth=0.5)
+plt.axvline(x=th_bre,color="orange",linewidth=0.5)
+plt.xlabel('$b_y-b_x$', fontsize=20.0)
+plt.ylabel("$h_x^*(bre)-h_x^*(sub)$", fontsize=20.0)
 
-plt.legend(["$s_x=0.47$","$ s_x=0.39$","$s_x=0.31$"],fontsize =13.0, bbox_to_anchor=[0.66,0.98])
+#Aiii and iv: with group augmentation
+#Data:
+data_sub = pd.read_csv('result_b_GA_sub_3.csv')
+data_bre = pd.read_csv('result_b_GA_bre_3.csv')
+db = np.array(data_sub.loc[:, "db"])
+b = np.array(data_sub.loc[:, "b"])
+hx_data_sub = np.array(data_sub.loc[:, "h_x"])
+hx_data_bre = np.array(data_bre.loc[:, "h_x"])
+
+#Dimension
+n_db = int(len(db)/3)
+n_b = 3
+db = db[0:n_db]
+B = np.zeros(3)
+
+for i in range(0, n_b):
+    B[i] = b[i*n_db]
+
+#Delay dispersal level
+hx_data_sub_b = hx_data_sub[n_db:2*n_db]
+hx_data_bre_b = hx_data_bre[n_db:2*n_db]
+#Threshold
+th_sub=db[len(db)-sum(hx_data_sub_b>0)-1]
+th_bre=db[len(db)-sum(hx_data_bre_b>0)-1]
+#Conflict
+hx_data_diff_b1 = hx_data_bre[0:n_db]-hx_data_sub[0:n_db]
+hx_data_diff_b2 = hx_data_bre[n_db:2*n_db]-hx_data_sub[n_db:2*n_db]
+hx_data_diff_b3 = hx_data_bre[-n_db:]-hx_data_sub[-n_db:]
+
+#Plot
+fig, ax = plt.subplots()
+plt.plot(db, hx_data_sub_b, color="black")
+plt.plot(db, hx_data_bre_b, color="grey")
+plt.ylim([0,1])
+plt.axvline(x=th_sub,color="brown",linewidth=0.5)
+plt.axvline(x=th_bre,color="orange",linewidth=0.5)
+plt.xlabel('$b_y-b_x$', fontsize=20.0)
+plt.ylabel("$h_x^*$ level", fontsize=20.0)
+ax.legend(["sub ctrl", "breeder ctrl"])
+
+#Conflict plot
+fig, ax = plt.subplots()
+plt.plot(db, hx_data_diff_b1, color="black", linestyle="dashed")
+plt.plot(db, hx_data_diff_b2, color="black")
+plt.plot(db, hx_data_diff_b3, color="black", linestyle="dotted")
+plt.legend(["$b_x=4.0$", "$b_x=5.0$", "$b_x=6.0$"])
+plt.ylim([0,1])
+plt.axvline(x=th_sub,color="brown",linewidth=0.5)
+plt.axvline(x=th_bre,color="orange",linewidth=0.5)
+plt.xlabel('$b_y-b_x$', fontsize=20.0)
+plt.ylabel("$h_x^*(bre)-h_x^*(sub)$", fontsize=20.0)
+#######################################
+
+
+# Panel B: survival benefits
+#Bi and ii: no group augmentation
+#Data collection
+data_sub = pd.read_csv('result_s_sub_3.csv')
+data_bre = pd.read_csv('result_s_bre_3.csv')
+ds = np.array(data_sub.loc[:, "ds"])
+s = np.array(data_sub.loc[:, "s"])
+hx_data_sub = np.array(data_sub.loc[:, "h_x"])
+hx_data_bre = np.array(data_bre.loc[:, "h_x"])
+
+#Dimension
+n_ds = int(len(ds)/3)
+n_s = 3
+ds = ds[0:n_ds]
+S = np.zeros(3)
+
+#Data computation
+for i in range(0, n_s):
+    S[i] = s[i*n_ds]
+hx_data_sub_s = hx_data_sub[n_ds:2*n_ds]
+hx_data_bre_s = hx_data_bre[n_ds:2*n_ds]
+
+#Threshold
+th_sub=ds[len(ds)-sum(hx_data_sub_s>0)-1]
+th_bre=ds[len(ds)-sum(hx_data_bre_s>0)-1]
+#Conflict
+hx_data_diff_s1 = hx_data_bre[0:n_ds]-hx_data_sub[0:n_ds]
+hx_data_diff_s2 = hx_data_bre[n_ds:2*n_ds]-hx_data_sub[n_ds:2*n_ds]
+hx_data_diff_s3 = hx_data_bre[-n_ds:]-hx_data_sub[-n_ds:]
+
+#Plot
+fig, ax = plt.subplots()
+plt.plot(ds, hx_data_sub_s, color="black")
+plt.plot(ds, hx_data_bre_s, color="grey")
+plt.xlabel('$s_y-s_x$', fontsize=20.0)
+plt.ylabel("$h_x^*$ level", fontsize=20.0)
+ax.legend(["sub ctrl", "breeder ctrl"])
+plt.ylim([0,1])
+plt.axvline(x=th_sub,color="brown",linewidth=0.5)
+plt.axvline(x=th_bre,color="orange",linewidth=0.5)
+
+#Plot of the conflict
+fig, ax = plt.subplots()
+plt.plot(ds, hx_data_diff_s1, color="black", linestyle="dashed")
+plt.plot(ds, hx_data_diff_s2, color="black")
+plt.plot(ds, hx_data_diff_s3, color="black", linestyle="dotted")
+plt.legend(["$s_x=0.5$", "$s_x=0.6$", "$s_x=0.7$"])
+plt.ylim([0,1])
+plt.axvline(x=th_sub,color="brown",linewidth=0.5)
+plt.axvline(x=th_bre,color="orange",linewidth=0.5)
+plt.xlabel('$s_y-s_x$', fontsize=20.0)
+plt.ylabel("$h_x^*(bre)-h_x^*(sub)$", fontsize=20.0)
+
+
+#Panel Biii, iv: with group augmentation
+#Data collection 
+data_sub = pd.read_csv('result_s_GA_sub_3.csv')
+data_bre = pd.read_csv('result_s_GA_bre_3.csv')
+ds = np.array(data_sub.loc[:, "ds"])
+s = np.array(data_sub.loc[:, "s"])
+hx_data_sub = np.array(data_sub.loc[:, "h_x"])
+hx_data_bre = np.array(data_bre.loc[:, "h_x"])
+
+#Dimension
+n_ds = int(len(ds)/3)
+n_s = 3
+ds = ds[0:n_ds]
+S = np.zeros(3)
+
+#Data computation
+for i in range(0, n_s):
+    S[i] = s[i*n_ds]
+hx_data_sub_s = hx_data_sub[n_ds:2*n_ds]
+hx_data_bre_s = hx_data_bre[n_ds:2*n_ds]
+#Threshold
+th_sub=ds[len(ds)-sum(hx_data_sub_s>0)-1]
+th_bre=ds[len(ds)-sum(hx_data_bre_s>0)-1]
+#Conflict
+hx_data_diff_s1 = hx_data_bre[0:n_ds]-hx_data_sub[0:n_ds]
+hx_data_diff_s2 = hx_data_bre[n_ds:2*n_ds]-hx_data_sub[n_ds:2*n_ds]
+hx_data_diff_s3 = hx_data_bre[-n_ds:]-hx_data_sub[-n_ds:]
+
+#Plot
+fig, ax = plt.subplots()
+plt.plot(ds, hx_data_sub_s, color="black")
+plt.plot(ds, hx_data_bre_s, color="grey")
+plt.ylim([0,1])
+plt.axvline(x=th_sub,color="brown",linewidth=0.5)
+plt.axvline(x=th_bre,color="orange",linewidth=0.5)
+plt.xlabel('$s_y-s_x$', fontsize=20.0)
+plt.ylabel("$h_x^*$ level", fontsize=20.0)
+ax.legend(["sub ctrl", "breeder ctrl"])
+
+#Plot of the conflict
+fig, ax = plt.subplots()
+plt.plot(ds, hx_data_diff_s1, color="black", linestyle="dashed")
+plt.plot(ds, hx_data_diff_s2, color="black")
+plt.plot(ds, hx_data_diff_s3, color="black", linestyle="dotted")
+plt.legend(["$s_x=0.5$", "$s_x=0.6$", "$s_x=0.7$"])
+plt.ylim([0,1])
+plt.axvline(x=th_sub,color="brown",linewidth=0.5)
+plt.axvline(x=th_bre,color="orange",linewidth=0.5)
+plt.xlabel('$s_y-s_x$', fontsize=20.0)
+plt.ylabel("$h_x^*(bre)-h_x^*(sub)$", fontsize=20.0)
 
 
 
+#Panel C: group augmentation level: i and ii
+#Data collection
+data_sub = pd.read_csv('result_say_sub_3.csv')
+data_bre = pd.read_csv('result_say_bre_3.csv')
+ds = np.array(data_sub.loc[:, "ds"])
+s = np.array(data_sub.loc[:, "s"])
+hx_data_sub = np.array(data_sub.loc[:, "h_x"])
+hx_data_bre = np.array(data_bre.loc[:, "h_x"])
+
+#Dimension
+n_ds = int(len(ds)/3)
+n_s = 3
+ds = ds[0:n_ds]
+S = np.zeros(3)
+
+#Data computation
+for i in range(0, n_s):
+    S[i] = s[i*n_ds]
+hx_data_sub_s = hx_data_sub[n_ds:2*n_ds]
+hx_data_bre_s = hx_data_bre[n_ds:2*n_ds]
+#Conflict
+hx_data_diff_s1 = hx_data_bre[0:n_ds]-hx_data_sub[0:n_ds]
+hx_data_diff_s2 = hx_data_bre[n_ds:2*n_ds]-hx_data_sub[n_ds:2*n_ds]
+hx_data_diff_s3 = hx_data_bre[-n_ds:]-hx_data_sub[-n_ds:]
+
+#Plot 
+fig, ax = plt.subplots()
+plt.plot(ds, hx_data_sub_s, color="black")
+plt.plot(ds, hx_data_bre_s, color="grey")
+plt.xlabel('$s_{a_y}-s_{a_x}$', fontsize=20.0)
+plt.ylabel("$h_x^*$ level", fontsize=20.0)
+ax.xaxis.set_ticks(np.arange(0, max(ds)+0.01, 0.05))
+ax.legend(["sub ctrl", "breeder ctrl"])
+plt.ylim([0,1])
+fig, ax = plt.subplots()
+
+#Plot of the conflict
+plt.plot(ds, hx_data_diff_s1, color="black", linestyle="dashed")
+plt.plot(ds, hx_data_diff_s2, color="black")
+plt.plot(ds, hx_data_diff_s3, color="black", linestyle="dotted")
+ax.xaxis.set_ticks(np.arange(0, max(ds)+0.01, 0.05))
+plt.ylim([0,1])
+plt.legend(["$s_{a_x}=0.5$", "$s_{a_x}=0.6$", "$s_{a_x}=0.7$"])
+plt.xlabel('$s_{a_y}-s_{a_x}$', fontsize=20.0)
+plt.ylabel("$h_x^*(bre)-h_x^*(sub)$", fontsize=20.0)
 
 
 
+##################################
+# Supplementary data
+#Level of delay dispersal when group bring benefits only to the survival of subordinates: s_u<s_ax=s_ay, by=bx, sy=sx
+#and conflict over delay dispersal
+#Data collection 
+data_sub = pd.read_csv('result_sa_sub_3.csv')
+data_bre = pd.read_csv('result_sa_bre_3.csv')
+ds = np.array(data_sub.loc[:, "ds"])
+s = np.array(data_sub.loc[:, "s"])
+hx_data_sub = np.array(data_sub.loc[:, "h_x"])
+hx_data_bre = np.array(data_bre.loc[:, "h_x"])
 
+#Dimension
+n_ds = int(len(ds)/3)
+n_s = 3
+ds = ds[0:n_ds]
+S = np.zeros(3)
 
+#Data computation
+for i in range(0, n_s):
+    S[i] = s[i*n_ds]
+hx_data_sub_s = hx_data_sub[n_ds:2*n_ds]
+hx_data_bre_s = hx_data_bre[n_ds:2*n_ds]
+#Conflict
+hx_data_diff_s1 = hx_data_bre[0:n_ds]-hx_data_sub[0:n_ds]
+hx_data_diff_s2 = hx_data_bre[n_ds:2*n_ds]-hx_data_sub[n_ds:2*n_ds]
+hx_data_diff_s3 = hx_data_bre[-n_ds:]-hx_data_sub[-n_ds:]
 
+#Plot
+fig, ax = plt.subplots()
+plt.plot(ds, hx_data_sub_s, color="black")
+plt.plot(ds, hx_data_bre_s, color="grey")
+plt.xlabel('$b_y-b_x$', fontsize=20.0)
+plt.ylabel("$h_x$ level", fontsize=20.0)
+ax.legend(["sub ctrl", "breeder ctrl"])
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#Conflict over delay dispersal
+fig, ax = plt.subplots()
+plt.plot(ds, hx_data_diff_s1, color="black", linestyle="dashed")
+plt.plot(ds, hx_data_diff_s2, color="black")
+plt.plot(ds, hx_data_diff_s3, color="black", linestyle="dotted")
+plt.legend(["$s_{a_x}=0.5$", "$s_{a_x}=0.6$", "$s_{a_x}=0.7$"])
+plt.xlabel('$s_y-s_x$', fontsize=20.0)
+plt.ylabel("$h_x(bre)-h_x(sub)$", fontsize=20.0)
 
 
 ##############
-#Help level with subordinate's control and fecundity benefit
-data = pd.read_csv('result_p_b_sub.csv')
+#Effect of varying the selfing rate phi over dispersal level and conflict with group augmentation and fecundity benefits
+#Data collection
+data_sub = pd.read_csv('result_phi_b_GA_sub_3.csv')
+data_bre = pd.read_csv('result_phi_b_GA_bre_3.csv')
+phi = np.array(data_sub.loc[:, "phi"])
+db = np.array(data_sub.loc[:, "db"])
+hx_data_sub = np.array(data_sub.loc[:, "h_x"])
+hx_data_bre = np.array(data_bre.loc[:, "h_x"])
 
-db = np.array(data.loc[:,"db"])
-b = np.array(data.loc[:,"b"])
-hx_data = np.array(data.loc[:,"h_x"])
+#Dimension
+n_phi = int(len(phi)/3)
+n_db = 3
+Phi = phi[0:n_phi]
+#Data computation
+hx_data_sub_b = hx_data_sub[n_phi:2*n_phi]
+hx_data_bre_b = hx_data_bre[n_phi:2*n_phi]
+#Conflict
+hx_data_diff_bGA1 = hx_data_bre[0:n_phi]-hx_data_sub[0:n_phi]
+hx_data_diff_bGA2 = hx_data_bre[n_phi:2*n_phi]-hx_data_sub[n_phi:2*n_phi]
+hx_data_diff_bGA3 = hx_data_bre[-n_phi:]-hx_data_sub[-n_phi:]
 
+#pàPlot
+fig, ax = plt.subplots()
+plt.plot(Phi, hx_data_sub_b, color="black")
+plt.plot(Phi, hx_data_bre_b, color="grey")
+plt.xlabel('$\phi$', fontsize=20.0)
+plt.ylabel("$h_x^*$ level", fontsize=20.0)
+ax.legend(["sub ctrl", "breeder ctrl"])
+#Plot of the conflict
+fig, ax = plt.subplots()
+plt.plot(Phi, hx_data_diff_bGA1, color="black", linestyle="dashed")
+plt.plot(Phi, hx_data_diff_bGA2, color="black")
+plt.plot(Phi, hx_data_diff_bGA3, color="black", linestyle="dotted")
+plt.legend(["$b_y-b_x=2$", "$b_y-b_x=3$", "$b_y-b_x=4$"])
+plt.xlabel('$\phi$', fontsize=20.0)
+plt.ylabel("$h_x^*(bre)-h_x^*(sub)$", fontsize=20.0)
 
-n_db = int(np.sqrt(len(db)))
-n_b = n_db
-db = db[0:n_db]
-B = np.zeros(n_b)
+###############################
+#Effect of varying the selfing rate phi over dispersal level and conflict with group augmentation and survival benefits
+#Data collection
+data_sub = pd.read_csv('result_phi_s_GA_sub_3.csv')
+data_bre = pd.read_csv('result_phi_s_GA_bre_3.csv')
+phi = np.array(data_sub.loc[:, "phi"])
+ds = np.array(data_sub.loc[:, "ds"])
+hx_data_sub = np.array(data_sub.loc[:, "h_x"])
+hx_data_bre = np.array(data_bre.loc[:, "h_x"])
 
-P = np.zeros(n_b)
-for i in range(0,n_b):
-    B[i] = b[i*n_db]
+#Dimension
+n_phi = int(len(phi)/3)
+n_ds = 3
+Phi = phi[0:n_phi]
+db = np.zeros(3)
+#Computation of the data
+for i in range(0, n_ds):
+    ds[i] = s[i*n_phi]
+hx_data_sub_s = hx_data_sub[0:n_phi]
+hx_data_bre_s = hx_data_bre[0:n_phi]
+#Conflict
+hx_data_diff_s1 = hx_data_bre[0:n_phi]-hx_data_sub[0:n_phi]
+hx_data_diff_s2 = hx_data_bre[n_phi:2*n_phi]-hx_data_sub[n_phi:2*n_phi]
+hx_data_diff_s3 = hx_data_bre[-n_phi:]-hx_data_sub[-n_phi:]
 
-hx_sub_b = np.zeros((n_b,n_db))
-k = 0
-for i in range(0,n_b):
-    for j in range(0,n_db):
-        hx_sub_b[i,j] = hx_data[k]
-        k+=1
-        
-#Plot of h_x with subordinate's control and fecundity benefits
-fig, ax=plt.subplots()
-cp=ax.contourf(db,B,hx_sub_b)
-fig.colorbar(cp)
-
-#Plot of the nullcline Delta_(h_x) W=0
-level = np.linspace(0,1,1)
-cp=ax.contour(db,B,hx_sub_b,levels=level,colors="red")
-plt.xlabel('$b_y-b_x$',fontsize = 20.0)
-plt.ylabel("$b_x$",fontsize = 20.0)
-plt.title("Help level (subordinate's control)")
-
-#Help level with breeder control and fecundity benefit
-data = pd.read_csv('result_p_b_bre.csv')
-
-hx_data = np.array(data.loc[:,"h_x"])
-
-hx_bre_b = np.zeros((n_b,n_db))
-hx_diff_b = np.zeros((n_b,n_db))
-k = 0
-for i in range(0,n_b):
-    for j in range(0,n_db):
-        hx_bre_b[i,j] = hx_data[k]
-        hx_diff_b[i,j] =  hx_bre_b[i,j]-hx_sub_b[i,j]
-        k+=1
-
-#Plot of h_x with breeder's control and fecundity benefits
-
-fig, ax=plt.subplots()
-cp=ax.contourf(db,B,hx_bre_b)
-fig.colorbar(cp)
-
-#Plot of the nullcline Delta_(h_x) W=0
-level = np.linspace(0,1,1)
-cp=ax.contour(db,B,hx_bre_b,colors="orange",levels=level)
-plt.xlabel('$b_y-b_x$',fontsize = 20.0)
-plt.ylabel("$b_x$",fontsize = 20.0)
-plt.title("Help level (breeder's control')")
-
-#Plot of the difference of the helping rate when the breeder has control vs when the subordinate has control for fecundity benefits
-fig, ax=plt.subplots()
-cp=ax.contourf(db,B,hx_diff_b)
-fig.colorbar(cp)
-
-#Plot of the nullclines Delta_(h_x) W=0
-level = np.linspace(0,1,1)
-cp=ax.contour(db,B,hx_sub_b,colors="red",levels=level)
-cp=ax.contour(db,B,hx_bre_b,colors="orange",levels=level)
-
-plt.xlabel('$b_y-b_x$',fontsize = 20.0)
-plt.ylabel("$b_x$",fontsize = 20.0)
-plt.title("Help level difference (bre-sub)")
-
-
-#############################
-#Help level with subordinate's control and survival benefits
-data = pd.read_csv('result_p_s_sub.csv')
-ds = np.array(data.loc[:,"ds"])
-s = np.array(data.loc[:,"s"])
-hx_data = np.array(data.loc[:,"h_x"])
-
-
-n_ds = int(np.sqrt(len(ds)))
-n_s = n_ds
-ds = ds[0:n_ds]
-S = np.zeros(n_s)
-
-P = np.zeros(n_s)
-for i in range(0,n_s):
-    S[i] = s[i*n_ds]
-
-hx_sub_s = np.zeros((n_s,n_ds))
-k = 0
-for i in range(0,n_s):
-    for j in range(0,n_ds):
-        hx_sub_s[i,j] = hx_data[k]
-        k+=1
- 
-#Plot of h_x with subordinate's control and fecundity benefits
-fig, ax=plt.subplots()
-cp=ax.contourf(ds,S,hx_sub_s)
-fig.colorbar(cp)
-
-#Plot of the nullcline Delta_(h_x) W=0
-level = np.linspace(0,1,1)
-cp=ax.contour(ds,S,hx_sub_s,levels=level,colors="red")
-plt.xlabel('$s_y-s_x$',fontsize = 20.0)
-plt.ylabel("$s_x$",fontsize = 20.0)
-plt.title("Help level (subordinate's control)")
-
-#Help level with breeder's control and survival benefit
-data = pd.read_csv('result_p_s_bre.csv')
-hx_data = np.array(data.loc[:,"h_x"])
-
-
-hx_diff_s = np.zeros((n_s,n_ds))
-hx_bre_s = np.zeros((n_s,n_ds))
-k = 0
-for i in range(0,n_s):
-    for j in range(0,n_ds):
-        hx_bre_s[i,j] = hx_data[k]
-        hx_diff_s[i,j] =  hx_bre_s[i,j]-hx_sub_s[i,j]
-        
-        k+=1
-
-#Plot of h_x with breeder's control and fecundity benefits
-fig, ax=plt.subplots()
-cp=ax.contourf(ds,S,hx_bre_s)
-fig.colorbar(cp)        
-plt.xlabel('$s_y-s_x$',fontsize = 20.0)
-plt.ylabel("$s_x$",fontsize = 20.0)
-#Plot of the nullcline Delta_(h_x) W=0
-
-level = np.linspace(0,1,1)
-cp=ax.contour(ds,S,hx_bre_s,levels=level,colors="orange")
-
-#Plot of the difference of the helping rate when the breeder has control vs when the subordinate has control for fecundity benefits        
-fig, ax=plt.subplots()
-cp=ax.contourf(ds,S,hx_diff_s)
-fig.colorbar(cp)
-
-
-plt.xlabel('$s_y-s_x$',fontsize = 20.0)
-plt.ylabel("$s_x$",fontsize = 20.0)
-
-#Plot of the nullclines Delta_(h_x) W=0
-level = np.linspace(0,1,1)
-cp=ax.contour(ds,S,hx_sub_s,colors="red",levels=level)
-cp=ax.contour(ds,S,hx_bre_s,colors="orange",levels=level)
+#Plot
+fig, ax = plt.subplots()
+plt.plot(Phi, hx_data_sub_s, color="black")
+plt.plot(Phi, hx_data_bre_s, color="grey")
+plt.xlabel('$\phi$', fontsize=20.0)
+plt.ylabel("$h_x^*$ level", fontsize=20.0)
+ax.legend(["sub ctrl", "breeder ctrl"])
+#Plot of the conflict
+fig, ax = plt.subplots()
+plt.plot(Phi, hx_data_diff_s1, color="black", linestyle="dashed")
+plt.plot(Phi, hx_data_diff_s2, color="black")
+plt.plot(Phi, hx_data_diff_s3, color="black", linestyle="dotted")
+plt.legend(["$s_y-s_x=0.2$", "$s_y-s_x=0.3$", "$s_y-s_x=0.4$"])
+plt.xlabel('$\phi$', fontsize=20.0)
+plt.ylabel("$h_x^*(bre)-h_x^*(sub)$", fontsize=20.0)
